@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import { validationCheck } from "../../middleware/validationCheck";
 import { User } from "../../models/User";
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.post(
       .isLength({ min: 6 })
       .withMessage("Password must contain atleast 6 characters!"),
   ],
+  validationCheck,
   async (req: Request, res: Response) => {
     const { username, password } = req.body as UserAttrs;
     const exists = await User.findOne({

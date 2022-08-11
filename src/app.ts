@@ -4,10 +4,16 @@ import cors from "cors";
 import "express-async-errors";
 import "dotenv/config";
 
+import { errorCheck } from "./middleware/errorCheck";
+import { signUpRouter } from "./routes/auth/signup";
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use(signUpRouter);
+app.use(errorCheck);
 
 const start = async () => {
   try {
