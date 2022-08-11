@@ -1,4 +1,6 @@
 import mongoose, { mongo } from "mongoose";
+import bcrypt from "bcrypt";
+import { EncryptionError } from "../errors/encryptionError";
 
 interface UserAttrs {
   username: string;
@@ -28,6 +30,16 @@ const userSchema = new mongoose.Schema({
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
 };
+
+userSchema.pre("save", async function (done) {
+  try {
+    const password = await bcrypt.hash(this.password, 10);
+    this.set({ password });
+  } catch (error) {
+    throw new EncryptionError("The password encryption failed!");
+  }
+  done();
+});
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
 
