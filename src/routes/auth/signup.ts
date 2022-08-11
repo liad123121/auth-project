@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import { ValidationSimpleError } from "../../errors/validationSimpleError";
 import { validationCheck } from "../../middleware/validationCheck";
 import { User } from "../../models/User";
 
@@ -31,7 +32,7 @@ router.post(
     });
 
     if (exists) {
-      throw new Error("User already exists!");
+      throw new ValidationSimpleError("User already exists!");
     }
 
     const user = User.build({
