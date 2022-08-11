@@ -1,7 +1,13 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import { User } from "../../models/User";
 
 const router = express.Router();
+
+interface UserAttrs {
+  username: string;
+  password: string;
+}
 
 router.post(
   "/api/auth/signup",
@@ -16,7 +22,25 @@ router.post(
       .isLength({ min: 6 })
       .withMessage("Password must contain atleast 6 characters!"),
   ],
-  (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const { username, password } = req.body as UserAttrs;
+    const exists = await User.findOne({
+      username: username.trim().toLowerCase(),
+    });
+
+    if (exists) {
+      throw new Error("User already exists!");
+    }
+
+    const user = User.build({
+      username: username.trim().toLowerCase(),
+      password,
+    });
+
+    await user.save();
+
+    res.status(201).send(user);
+  }
 );
 
 export { router as signUpRouter };
