@@ -2,7 +2,7 @@ import mongoose, { mongo } from "mongoose";
 import bcrypt from "bcrypt";
 import { EncryptionError } from "../errors/encryptionError";
 
-interface UserAttrs {
+export interface UserAttrs {
   username: string;
   password: string;
 }
@@ -10,6 +10,7 @@ interface UserAttrs {
 interface UserDoc extends mongoose.Document {
   username: string;
   password: string;
+  comparePasswords(password: string): Promise<boolean>;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -29,6 +30,13 @@ const userSchema = new mongoose.Schema({
 
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
+};
+
+userSchema.methods.comparePasswords = async function (
+  password: string
+): Promise<boolean> {
+  const compare = await bcrypt.compare(password, this.password);
+  return compare;
 };
 
 userSchema.pre("save", async function (done) {

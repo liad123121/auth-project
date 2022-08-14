@@ -2,20 +2,15 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { ValidationSimpleError } from "../../errors/validationSimpleError";
 import { validationCheck } from "../../middleware/validationCheck";
-import { User } from "../../models/User";
-import jwt from "jsonwebtoken";
+import { User, UserAttrs } from "../../models/User";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const router = express.Router();
-
-interface UserAttrs {
-  username: string;
-  password: string;
-}
 
 declare global {
   namespace Express {
     interface Request {
-      user: string;
+      user: string | JwtPayload | null;
     }
   }
 }
@@ -50,11 +45,10 @@ router.post(
     });
 
     const token = jwt.sign({ username }, process.env.SECRET_TOKEN!);
-    req.user = token;
 
     await user.save();
 
-    res.status(201).send(user);
+    res.status(201).send(token);
   }
 );
 

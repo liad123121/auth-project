@@ -3,10 +3,6 @@ import jwt from "jsonwebtoken";
 import { AuthorizationError } from "../errors/authorizationError";
 
 export const tokenCheck = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    throw new AuthorizationError("Token isn't valid!");
-  }
-
   const reqToken =
     req.headers.authorization && req.headers.authorization.split(" ")[1];
 
@@ -18,6 +14,8 @@ export const tokenCheck = (req: Request, res: Response, next: NextFunction) => {
   if (!token) {
     throw new AuthorizationError("Token isn't valid!");
   }
+
+  req.user = token;
 
   next();
 };

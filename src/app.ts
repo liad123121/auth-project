@@ -6,8 +6,11 @@ import "dotenv/config";
 
 import { errorCheck } from "./middleware/errorCheck";
 import { signUpRouter } from "./routes/auth/signup";
+import { signOutRouter } from "./routes/auth/signout";
 import { NotFoundError } from "./errors/notFoundError";
 import { DBConnectionError } from "./errors/DBConnectionError";
+import { signInRouter } from "./routes/auth/signin";
+import { currentUserRouter } from "./routes/auth/currentUser";
 
 const app = express();
 
@@ -15,9 +18,14 @@ app.use(cors());
 app.use(express.json());
 
 app.use(signUpRouter);
+app.use(signOutRouter);
+app.use(signInRouter);
+app.use(currentUserRouter);
+
 app.all("*", () => {
   throw new NotFoundError("The page isn't available!");
 });
+
 app.use(errorCheck);
 
 const start = async () => {
