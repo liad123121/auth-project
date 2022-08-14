@@ -25,6 +25,9 @@ const start = async () => {
     if (!process.env.MONGO_URI) {
       throw new NotFoundError("No URI has been given!");
     }
+    if (!process.env.SECRET_TOKEN) {
+      throw new NotFoundError("No secret token has been given!");
+    }
 
     await mongoose.connect(process.env.MONGO_URI);
   } catch (err) {

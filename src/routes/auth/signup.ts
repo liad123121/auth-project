@@ -3,12 +3,21 @@ import { body } from "express-validator";
 import { ValidationSimpleError } from "../../errors/validationSimpleError";
 import { validationCheck } from "../../middleware/validationCheck";
 import { User } from "../../models/User";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
 interface UserAttrs {
   username: string;
   password: string;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user: string;
+    }
+  }
 }
 
 router.post(
@@ -39,6 +48,9 @@ router.post(
       username: username.trim().toLowerCase(),
       password,
     });
+
+    const token = jwt.sign({ username }, process.env.SECRET_TOKEN!);
+    req.user = token;
 
     await user.save();
 
